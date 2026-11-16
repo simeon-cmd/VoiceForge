@@ -1,0 +1,18 @@
+# Python
+backend/venv/
+__pycache__/
+*.pyc
+
+# Generated at runtime — don't commit cloned voices or generated clips
+backend/storage/voices/*
+backend/storage/outputs/*
+backend/storage/voices.json
+!backend/storage/voices/.gitkeep
+!backend/storage/outputs/.gitkeep
+
+# Local dev TLS certs — regenerate per-machine with certs/make_certs.py
+certs/dev.crt
+certs/dev.key
+
+# OS cruft
+.DS_Store

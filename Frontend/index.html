@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VoiceForge — Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,560;1,9..144,460&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F1115;
+    --panel:#171A21;
+    --panel-raised:#1D212A;
+    --line:#262A33;
+    --ink:#EDEEF2;
+    --ink-dim:#9096A3;
+    --ink-faint:#5B6170;
+    --teal:#5EEAD4;
+    --teal-dim:rgba(94,234,212,0.14);
+    --amber:#F2B134;
+    --danger:#E8604C;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(94,234,212,0.07), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(242,177,52,0.05), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Space Grotesk', sans-serif;
+    min-height:100vh;
+  }
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:40px 28px 80px;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:24px;
+    margin-bottom:48px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px;
+  }
+  .wordmark{
+    font-family:'Fraunces', serif;
+    font-weight:560;
+    font-size:34px;
+    letter-spacing:-0.01em;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .wordmark .dot{
+    width:9px;height:9px;border-radius:50%;
+    background:var(--teal);
+    box-shadow:0 0 14px 3px rgba(94,234,212,0.55);
+  }
+  .tagline{
+    color:var(--ink-dim);
+    font-size:14.5px;
+    max-width:360px;
+    text-align:right;
+    line-height:1.5;
+  }
+
+  /* ---------- Layout ---------- */
+  .studio{
+    display:grid;
+    grid-template-columns:340px 1fr;
+    gap:28px;
+    align-items:start;
+  }
+  @media (max-width:860px){
+    .studio{grid-template-columns:1fr;}
+  }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:24px;
+  }
+  .panel h2{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:19px;
+    margin:0 0 4px;
+  }
+  .panel .sub{
+    color:var(--ink-dim);
+    font-size:13.5px;
+    margin:0 0 20px;
+    line-height:1.5;
+  }
+
+  /* ---------- Voice library ---------- */
+  .voice-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-bottom:20px;
+    max-height:360px;
+    overflow-y:auto;
+  }
+  .voice-card{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid transparent;
+    cursor:pointer;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .voice-card:hover{background:var(--panel-raised);}
+  .voice-card.active{
+    background:var(--teal-dim);
+    border-color:rgba(94,234,212,0.4);
+  }
+  .voice-card .name{
+    font-size:14.5px;
+    font-weight:500;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .voice-card .meta{
+    font-size:11.5px;
+    color:var(--ink-faint);
+  }
+  .voice-card .remove{
+    border:none;
+    background:none;
+    color:var(--ink-faint);
+    cursor:pointer;
+    font-size:16px;
+    line-height:1;
+    padding:4px;
+    flex-shrink:0;
+  }
+  .voice-card .remove:hover{color:var(--danger);}
+  .empty-state{
+    color:var(--ink-faint);
+    font-size:13px;
+    padding:18px 4px;
+    line-height:1.6;
+  }
+
+  .divider{
+    height:1px;
+    background:var(--line);
+    margin:20px 0;
+  }
+
+  label.field-label{
+    display:block;
+    font-size:12.5px;
+    color:var(--ink-dim);
+    margin-bottom:7px;
+  }
+  input[type="text"], select, textarea{
+    width:100%;
+    background:var(--panel-raised);
+    border:1px solid var(--line);
+    border-radius:9px;
+    color:var(--ink);
+    font-family:inherit;
+    font-size:14px;
+    padding:10px 12px;
+    outline:none;
+    transition:border-color .15s ease;
+  }
+  input[type="text"]:focus, select:focus, textarea:focus{
+    border-color:rgba(94,234,212,0.55);
+  }
+  textarea{resize:vertical; min-height:120px; line-height:1.55;}
+
+  .record-row{
+    display:flex;
+    gap:10px;
+    margin-top:14px;
+  }
+  button{
+    font-family:inherit;
+    cursor:pointer;
+  }
+  .btn{
+    border:1px solid var(--line);
+    background:var(--panel-raised);
+    color:var(--ink);
+    padding:10px 16px;
+    border-radius:9px;
+    font-size:13.5px;
+    font-weight:500;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .btn:hover{border-color:var(--ink-faint);}
+  .btn.primary{
+    background:var(--teal);
+    border-color:var(--teal);
+    color:#0A1412;
+    font-weight:600;
+  }
+  .btn.primary:hover{background:#7FF1DF;}
+  .btn.record{
+    background:transparent;
+    border-color:var(--danger);
+    color:var(--danger);
+    flex:1;
+  }
+  .btn.record.active{
+    background:var(--danger);
+    color:#1b0b08;
+  }
+  .btn:disabled{opacity:.45; cursor:not-allowed;}
+  .btn.full{width:100%;}
+
+  input[type="file"]{display:none;}
+
+  /* ---------- Studio pane ---------- */
+  .studio-pane .row{
+    display:flex;
+    gap:14px;
+    margin-bottom:16px;
+  }
+  .studio-pane .row > div{flex:1;}
+
+  .char-count{
+    text-align:right;
+    font-size:11.5px;
+    color:var(--ink-faint);
+    margin-top:6px;
+  }
+
+  .waveform-stage{
+    margin-top:22px;
+    background:var(--panel-raised);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:18px 18px 14px;
+  }
+  canvas#wave{
+    width:100%;
+    height:92px;
+    display:block;
+  }
+  .player-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-top:12px;
+  }
+  .player-row .btn.playpause{
+    width:38px;height:38px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    padding:0;
+    flex-shrink:0;
+  }
+  .player-row audio{display:none;}
+  .player-time{
+    font-size:12px;
+    color:var(--ink-faint);
+    font-variant-numeric:tabular-nums;
+    min-width:84px;
+  }
+  .status-line{
+    margin-top:16px;
+    font-size:13px;
+    color:var(--ink-dim);
+    min-height:18px;
+  }
+  .status-line.error{color:var(--danger);}
+  .status-line.ok{color:var(--teal);}
+
+  .consent-note{
+    margin-top:28px;
+    font-size:12px;
+    color:var(--ink-faint);
+    line-height:1.6;
+    border-top:1px solid var(--line);
+    padding-top:16px;
+  }
+
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="wordmark"><span class="dot"></span>VoiceForge</div>
+    <div class="tagline">Clone a voice from a short sample, then type anything and hear it spoken back.</div>
+  </header>
+
+  <div class="studio">
+
+    <!-- ===================== LEFT: VOICE LIBRARY ===================== -->
+    <section class="panel">
+      <h2>Voices</h2>
+      <p class="sub">Record or upload a clear sample, at least 10&ndash;15 seconds, of the voice you want to clone.</p>
+
+      <div id="voiceList" class="voice-list">
+        <div class="empty-state">No voices yet — add one below to get started.</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <label class="field-label">Voice name</label>
+      <input type="text" id="voiceName" placeholder="e.g. Narrator, My voice, Grandpa" />
+
+      <div class="record-row">
+        <button class="btn record" id="recordBtn">● Record sample</button>
+        <button class="btn" id="uploadBtn">Upload file</button>
+        <input type="file" id="fileInput" accept=".wav,.mp3,.m4a,.ogg,.flac,.webm" />
+      </div>
+
+      <button class="btn primary full" id="saveVoiceBtn" style="margin-top:10px;" disabled>Save voice</button>
+
+      <div class="status-line" id="voiceStatus"></div>
+
+      <div class="consent-note">
+        Only clone a voice you own or have explicit permission to use. Cloning someone without their consent can be illegal and is against most providers' terms.
+      </div>
+    </section>
+
+    <!-- ===================== RIGHT: SYNTHESIS STUDIO ===================== -->
+    <section class="panel studio-pane">
+      <h2>Speak</h2>
+      <p class="sub">Pick a voice on the left, type your text, and generate audio in that voice.</p>
+
+      <label class="field-label">Text to speak</label>
+      <textarea id="textInput" maxlength="2000" placeholder="Type or paste what you want the selected voice to say..."></textarea>
+      <div class="char-count"><span id="charCount">0</span> / 2000</div>
+
+      <div class="row" style="margin-top:16px;">
+        <div>
+          <label class="field-label">Language</label>
+          <select id="languageSelect">
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="it">Italian</option>
+            <option value="pt">Portuguese</option>
+            <option value="pl">Polish</option>
+            <option value="ja">Japanese</option>
+            <option value="ko">Korean</option>
+            <option value="zh-cn">Chinese (Mandarin)</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Speed: <span id="speedVal">1.0×</span></label>
+          <input type="range" id="speedRange" min="0.6" max="1.4" step="0.05" value="1.0" style="width:100%; margin-top:10px;" />
+        </div>
+      </div>
+
+      <button class="btn primary full" id="synthesizeBtn" style="margin-top:6px;" disabled>Generate speech</button>
+
+      <div class="status-line" id="synthStatus"></div>
+
+      <div class="waveform-stage">
+        <canvas id="wave" width="900" height="92"></canvas>
+        <div class="player-row">
+          <button class="btn playpause" id="playBtn" disabled>▶</button>
+          <span class="player-time" id="playerTime">0:00 / 0:00</span>
+          <audio id="audioEl"></audio>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+// If the frontend is hosted separately from the backend (e.g. this page on
+// GitHub Pages, the backend on Render), fill in that backend's public URL
+// here once, after you deploy it — e.g. 'https://voiceforge-backend.onrender.com'.
+// Leave it empty while developing locally or on your own LAN; in that case
+// the code below falls back to assuming the backend is on the same host,
+// port 8000 (see README.md for both setups).
+const DEFAULT_PROD_API = ''; // <-- put your Render backend URL here
+
+// Override at any time (e.g. to point a local copy at a different backend)
+// by adding ?api=https://your-backend-host to the page URL, or by setting
+// it once via the browser console: localStorage.setItem('voiceforge_api', '...')
+function resolveApiBase(){
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('api')) {
+    localStorage.setItem('voiceforge_api', params.get('api'));
+    return params.get('api');
+  }
+  const stored = localStorage.getItem('voiceforge_api');
+  if(stored) return stored;
+
+  const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.protocol === 'file:';
+  if(!isLocalHost && DEFAULT_PROD_API){
+    return DEFAULT_PROD_API;
+  }
+
+  const isFile = window.location.protocol === 'file:';
+  const protocol = isFile ? 'http:' : window.location.protocol;
+  const hostname = isFile ? 'localhost' : window.location.hostname;
+  return `${protocol}//${hostname}:8000`;
+}
+const API_BASE = resolveApiBase();
+
+let voices = [];
+let selectedVoiceId = null;
+let pendingSampleBlob = null;   // either a recorded Blob or a File
+let mediaRecorder = null;
+let recordedChunks = [];
+
+const el = (id) => document.getElementById(id);
+const voiceListEl = el('voiceList');
+const voiceNameEl = el('voiceName');
+const recordBtn = el('recordBtn');
+const uploadBtn = el('uploadBtn');
+const fileInput = el('fileInput');
+const saveVoiceBtn = el('saveVoiceBtn');
+const voiceStatus = el('voiceStatus');
+
+const textInput = el('textInput');
+const charCount = el('charCount');
+const languageSelect = el('languageSelect');
+const speedRange = el('speedRange');
+const speedVal = el('speedVal');
+const synthesizeBtn = el('synthesizeBtn');
+const synthStatus = el('synthStatus');
+const audioEl = el('audioEl');
+const playBtn = el('playBtn');
+const playerTime = el('playerTime');
+
+// ---------------------------------------------------------------- Voices --
+
+async function fetchVoices(){
+  try{
+    const res = await fetch(`${API_BASE}/api/voices`);
+    if(!res.ok) throw new Error('Could not reach the backend');
+    voices = await res.json();
+    renderVoices();
+  }catch(e){
+    voiceListEl.innerHTML = `<div class="empty-state">Can't reach the backend at ${API_BASE}. Start it with <code>uvicorn main:app --reload</code>.</div>`;
+  }
+}
+
+function renderVoices(){
+  if(voices.length === 0){
+    voiceListEl.innerHTML = `<div class="empty-state">No voices yet — add one below to get started.</div>`;
+    return;
+  }
+  voiceListEl.innerHTML = '';
+  voices.forEach(v => {
+    const card = document.createElement('div');
+    card.className = 'voice-card' + (v.id === selectedVoiceId ? ' active' : '');
+    card.innerHTML = `
+      <div>
+        <div class="name">${escapeHtml(v.name)}</div>
+        <div class="meta">${v.id}</div>
+      </div>
+      <button class="remove" title="Delete voice">&times;</button>
+    `;
+    card.addEventListener('click', (e) => {
+      if(e.target.closest('.remove')) return;
+      selectedVoiceId = v.id;
+      renderVoices();
+      updateSynthesizeEnabled();
+    });
+    card.querySelector('.remove').addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await fetch(`${API_BASE}/api/voices/${v.id}`, { method: 'DELETE' });
+      if(selectedVoiceId === v.id) selectedVoiceId = null;
+      fetchVoices();
+    });
+    voiceListEl.appendChild(card);
+  });
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ---------------------------------------------------------------- Record --
+
+recordBtn.addEventListener('click', async () => {
+  if(mediaRecorder && mediaRecorder.state === 'recording'){
+    mediaRecorder.stop();
+    return;
+  }
+  const isSecure = window.location.protocol === 'https:' || ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  if(!isSecure){
+    voiceStatus.textContent = 'Microphone access needs HTTPS when viewed from another computer — see README.md.';
+    voiceStatus.className = 'status-line error';
+    return;
+  }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    voiceStatus.textContent = 'This browser has no microphone API available on this page.';
+    voiceStatus.className = 'status-line error';
+    return;
+  }
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    recordedChunks = [];
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.ondataavailable = (e) => recordedChunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      pendingSampleBlob = new Blob(recordedChunks, { type: 'audio/webm' });
+      stream.getTracks().forEach(t => t.stop());
+      recordBtn.textContent = '● Record sample';
+      recordBtn.classList.remove('active');
+      updateSaveEnabled();
+      voiceStatus.textContent = 'Sample captured — give it a name and save.';
+      voiceStatus.className = 'status-line ok';
+    };
+    mediaRecorder.start();
+    recordBtn.textContent = '■ Stop recording';
+    recordBtn.classList.add('active');
+    voiceStatus.textContent = 'Recording... speak clearly for 10-15 seconds.';
+    voiceStatus.className = 'status-line';
+  }catch(e){
+    voiceStatus.textContent = 'Microphone access was blocked or unavailable.';
+    voiceStatus.className = 'status-line error';
+  }
+});
+
+uploadBtn.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', () => {
+  if(fileInput.files[0]){
+    pendingSampleBlob = fileInput.files[0];
+    voiceStatus.textContent = `Loaded "${fileInput.files[0].name}" — give it a name and save.`;
+    voiceStatus.className = 'status-line ok';
+    updateSaveEnabled();
+  }
+});
+
+function updateSaveEnabled(){
+  saveVoiceBtn.disabled = !(pendingSampleBlob && voiceNameEl.value.trim().length > 0);
+}
+voiceNameEl.addEventListener('input', updateSaveEnabled);
+
+saveVoiceBtn.addEventListener('click', async () => {
+  if(!pendingSampleBlob) return;
+  saveVoiceBtn.disabled = true;
+  voiceStatus.textContent = 'Uploading sample...';
+  voiceStatus.className = 'status-line';
+
+  const form = new FormData();
+  form.append('name', voiceNameEl.value.trim());
+  const filename = pendingSampleBlob.name || 'sample.webm';
+  form.append('file', pendingSampleBlob, filename);
+
+  try{
+    const res = await fetch(`${API_BASE}/api/voices`, { method: 'POST', body: form });
+    if(!res.ok){
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Upload failed');
+    }
+    voiceNameEl.value = '';
+    pendingSampleBlob = null;
+    fileInput.value = '';
+    voiceStatus.textContent = 'Voice saved.';
+    voiceStatus.className = 'status-line ok';
+    await fetchVoices();
+  }catch(e){
+    voiceStatus.textContent = e.message;
+    voiceStatus.className = 'status-line error';
+  }finally{
+    updateSaveEnabled();
+  }
+});
+
+// ---------------------------------------------------------------- Speak --
+
+textInput.addEventListener('input', () => {
+  charCount.textContent = textInput.value.length;
+  updateSynthesizeEnabled();
+});
+speedRange.addEventListener('input', () => {
+  speedVal.textContent = parseFloat(speedRange.value).toFixed(2) + '×';
+});
+
+function updateSynthesizeEnabled(){
+  synthesizeBtn.disabled = !(selectedVoiceId && textInput.value.trim().length > 0);
+}
+
+synthesizeBtn.addEventListener('click', async () => {
+  synthesizeBtn.disabled = true;
+  synthStatus.textContent = 'Generating speech... this can take a little while on CPU.';
+  synthStatus.className = 'status-line';
+
+  try{
+    const res = await fetch(`${API_BASE}/api/synthesize`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        voice_id: selectedVoiceId,
+        text: textInput.value.trim(),
+        language: languageSelect.value,
+        speed: parseFloat(speedRange.value),
+      }),
+    });
+    if(!res.ok){
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Synthesis failed');
+    }
+    const data = await res.json();
+    audioEl.src = `${API_BASE}${data.url}`;
+    playBtn.disabled = false;
+    synthStatus.textContent = 'Done — press play.';
+    synthStatus.className = 'status-line ok';
+    drawStaticWave();
+  }catch(e){
+    synthStatus.textContent = e.message;
+    synthStatus.className = 'status-line error';
+  }finally{
+    updateSynthesizeEnabled();
+  }
+});
+
+// ---------------------------------------------------------------- Player --
+
+let audioCtx, analyser, sourceNode, rafId;
+
+playBtn.addEventListener('click', () => {
+  if(audioEl.paused){
+    audioEl.play();
+  }else{
+    audioEl.pause();
+  }
+});
+audioEl.addEventListener('play', () => {
+  playBtn.textContent = '❚❚';
+  setupAnalyser();
+  animateWave();
+});
+audioEl.addEventListener('pause', () => {
+  playBtn.textContent = '▶';
+  cancelAnimationFrame(rafId);
+});
+audioEl.addEventListener('ended', () => {
+  playBtn.textContent = '▶';
+  cancelAnimationFrame(rafId);
+  drawStaticWave();
+});
+audioEl.addEventListener('timeupdate', () => {
+  playerTime.textContent = `${fmtTime(audioEl.currentTime)} / ${fmtTime(audioEl.duration || 0)}`;
+});
+
+function fmtTime(t){
+  if(!isFinite(t)) return '0:00';
+  const m = Math.floor(t / 60);
+  const s = Math.floor(t % 60).toString().padStart(2, '0');
+  return `${m}:${s}`;
+}
+
+function setupAnalyser(){
+  if(audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  sourceNode = audioCtx.createMediaElementSource(audioEl);
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
+  sourceNode.connect(analyser);
+  analyser.connect(audioCtx.destination);
+}
+
+const canvas = el('wave');
+const ctx2d = canvas.getContext('2d');
+
+function resizeCanvas(){
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * devicePixelRatio;
+  canvas.height = rect.height * devicePixelRatio;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function animateWave(){
+  const data = new Uint8Array(analyser.frequencyBinCount);
+  analyser.getByteFrequencyData(data);
+  drawBars(data);
+  rafId = requestAnimationFrame(animateWave);
+}
+
+function drawBars(data){
+  const w = canvas.width, h = canvas.height;
+  ctx2d.clearRect(0, 0, w, h);
+  const barCount = data.length;
+  const gap = w / barCount * 0.35;
+  const barW = (w / barCount) - gap;
+  for(let i = 0; i < barCount; i++){
+    const v = data[i] / 255;
+    const barH = Math.max(v * h * 0.9, h * 0.03);
+    const x = i * (barW + gap);
+    const y = (h - barH) / 2;
+    ctx2d.fillStyle = i % 5 === 0 ? '#F2B134' : '#5EEAD4';
+    ctx2d.globalAlpha = 0.85;
+    roundRect(ctx2d, x, y, barW, barH, Math.min(4, barW/2));
+  }
+}
+
+function drawStaticWave(){
+  const w = canvas.width, h = canvas.height;
+  ctx2d.clearRect(0, 0, w, h);
+  const bars = 64;
+  for(let i = 0; i < bars; i++){
+    const barW = (w / bars) * 0.65;
+    const gap = (w / bars) * 0.35;
+    const seed = Math.sin(i * 1.7) * 0.5 + 0.5;
+    const barH = h * (0.08 + seed * 0.12);
+    const x = i * (barW + gap);
+    const y = (h - barH) / 2;
+    ctx2d.fillStyle = '#2B313D';
+    roundRect(ctx2d, x, y, barW, barH, 3);
+  }
+}
+
+function roundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+  ctx.fill();
+}
+
+drawStaticWave();
+fetchVoices();
+</script>
+</body>
+</html>
